@@ -50,6 +50,22 @@ app.get('/todos/:id', (request, response) => {
   });
 });
 
+app.delete('/todos/:id', (request, response) => {
+  var id = request.params.id;
+  if (!ObjectID.isValid(id)) {
+    return response.status(404).send();
+  }
+  Todo.findByIdAndRemove(id).then((todo) => {
+    if (!todo) {
+      return response.status(404).send();
+    }
+    return response.send({todo});
+  }).catch((e) => response.status(400).send());
+  //if error return a 400 with empty body
+  //if success: if no doc send 404
+  // if doc send doc back with 200
+})
+
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
