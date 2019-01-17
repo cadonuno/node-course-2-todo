@@ -1,6 +1,7 @@
 const {ObjectID} = require("mongodb");
-var express = require('express');
-var bodyParser = require('body-parser');
+const _ = require('lodash');
+const express = require('express');
+const bodyParser = require('body-parser');
 
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
@@ -31,9 +32,6 @@ app.get('/todos', (request, response) => {
   })
 });
 
-//if invalid id return 404
-//findById(id) (success or error - return empty 400)
-//if Todo send it back, if no todo send back a 404
 app.get('/todos/:id', (request, response) => {
   var id = request.params.id;
   if (!ObjectID.isValid(id)) {
@@ -61,10 +59,34 @@ app.delete('/todos/:id', (request, response) => {
     }
     return response.send({todo});
   }).catch((e) => response.status(400).send());
-  //if error return a 400 with empty body
-  //if success: if no doc send 404
-  // if doc send doc back with 200
-})
+});
+
+app.patch('/todos/:id', (request, response) => {
+  var id = request.params.id;
+  var body = _.pick(request.body, ['text', 'completed']);
+
+  if (!ObjectID.isValid(id)) {
+    return response.status(404).send();
+  }
+
+  if (_.isBoolean(body.completed) && body.completed) {
+    body.completedAt = new Date().getTime();
+  } else {
+    body.completed = false;
+    body.completedAt = null;
+  }
+
+  Todo.findByIdAndUpdate(id, {
+    $set: body
+  }, {new: true}).then((todo) => {
+    if (!todo) {
+      return response.status(404).set()
+    }
+    response.send({todo});
+  }).catch((e) => {
+    response.status(400).set();
+  });
+});
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
