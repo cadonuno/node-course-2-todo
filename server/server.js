@@ -89,6 +89,20 @@ app.patch('/todos/:id', (request, response) => {
     response.status(400).set();
   });
 });
+//create users
+//use pick instead of individual properties
+app.post('/users', (request, response) => {
+  var user = new User(_.pick(request.body, ['email', 'password']));
+
+  user.save().then(() => {
+    return user.generateAuthToken();
+  }).then((token) => {
+    response.header('x-auth', token).send(user);
+  }).catch((e) => {
+    console.log(e);
+    response.status(400).send(e);
+  })
+});
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
