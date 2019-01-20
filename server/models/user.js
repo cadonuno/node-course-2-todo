@@ -52,6 +52,16 @@ UserSchema.methods.toJSON = function () {
   return _.pick(userObject, ['_id', 'email']);
 };
 
+UserSchema.methods.removeToken = function (token) {
+  var user = this;
+
+  return user.update({
+    $pull: {
+      tokens: {token}
+    }
+  });
+};
+
 UserSchema.statics.findByToken = function (token) {
   var User = this;
   var decoded;
@@ -96,7 +106,7 @@ UserSchema.statics.findByCredentials = function(email, password) {
           if (result) {
             resolve(user);
           } else {
-              reject();
+            reject();
           }
       });
     });

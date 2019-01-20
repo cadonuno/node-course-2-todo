@@ -91,8 +91,6 @@ app.patch('/todos/:id', (request, response) => {
   });
 });
 
-//create users
-//use pick instead of individual properties
 app.post('/users', (request, response) => {
   var user = new User(_.pick(request.body, ['email', 'password']));
 
@@ -117,6 +115,14 @@ app.post('/users/login', (request, response) => {
       response.header('x-auth', token).send(user);
     });
   }).catch((err) => {
+    response.status(400).send();
+  });
+});
+
+app.delete('/users/me/token', authenticate, (request, response) => {
+  request.user.removeToken(request.token).then(() => {
+    response.status(200).send();
+  }, () => {
     response.status(400).send();
   });
 });
