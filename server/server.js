@@ -101,15 +101,24 @@ app.post('/users', (request, response) => {
   }).then((token) => {
     response.header('x-auth', token).send(user);
   }).catch((e) => {
-    console.log(e);
     response.status(400).send(e);
   })
 });
 
-
-
 app.get('/users/me', authenticate, (request, response) => {
   response.send(request.user);
+});
+
+app.post('/users/login', (request, response) => {
+  var body = new User(_.pick(request.body, ['email', 'password']));
+
+  User.findByCredentials(body.email, body.password).then((user) => {
+    return user.generateAuthToken().then((token) => {
+      response.header('x-auth', token).send(user);
+    });
+  }).catch((err) => {
+    response.status(400).send();
+  });
 });
 
 app.listen(port, () => {
