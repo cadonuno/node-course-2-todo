@@ -90,6 +90,7 @@ app.patch('/todos/:id', (request, response) => {
     response.status(400).set();
   });
 });
+
 //create users
 //use pick instead of individual properties
 app.post('/users', (request, response) => {
