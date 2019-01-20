@@ -52,7 +52,7 @@ describe('POST /todos', () => {
   });
 });
 
-describe('GET /Todos', () => {
+describe('GET /todos', () => {
   it ('Should return all todos', (done) => {
     request(app)
       .get('/todos')
@@ -64,7 +64,7 @@ describe('GET /Todos', () => {
   });
 });
 
-describe('GET /Todos/:id', () => {
+describe('GET /todos/:id', () => {
   it ('should return todo doc', (done) => {
     request(app)
       .get(`/todos/${todos[0]._id.toHexString()}`)
